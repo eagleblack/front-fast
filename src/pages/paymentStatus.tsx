@@ -14,12 +14,12 @@ const PaymentStatus = () => {
     amount?: number;
     transactionId?: string;
   } | null>(null);
-
+ 
   const orderId = searchParams.get("orderId");
 
   // Replace with your Firebase Function URL
   const FIREBASE_FUNCTION_URL =
-    "https://api-ffxb4hjlga-uc.a.run.app/";
+    "https://fir-admin-d1ae6.web.app/api";
 
   useEffect(() => {
     if (!orderId) {
