@@ -9,7 +9,7 @@ import { useState, useEffect } from "react";
 const FeatureCategories = () => {
   const navigate = useNavigate();
   const { featuredData, featuredLoading, featuredError } = useWebflow();
-
+   console.log(featuredData)
   const { cartItems, addToCart, updateQuantity, updateSize, getProductQuantity } = useCart();
 
   const [sizeInputs, setSizeInputs] = useState<{ [key: string]: string }>({});

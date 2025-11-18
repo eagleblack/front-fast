@@ -19,7 +19,7 @@ const PaymentStatus = () => {
 
   // Replace with your Firebase Function URL
   const FIREBASE_FUNCTION_URL =
-    "http://127.0.0.1:5001/fir-admin-d1ae6/us-central1/api";
+    "https://api-ffxb4hjlga-uc.a.run.app/";
 
   useEffect(() => {
     if (!orderId) {
@@ -58,7 +58,10 @@ const PaymentStatus = () => {
       if (data.success) {
         // Handle PhonePe V2 style response
         const responseData = data.data;
-        const state = responseData?.state || responseData?.code;
+    const state =
+  responseData?.state || 
+  data.status || 
+  responseData?.code;
 
         switch (state) {
           case "COMPLETED":

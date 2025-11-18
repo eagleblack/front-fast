@@ -227,7 +227,7 @@ export default function Cart() {
 
   const startCheckout = () => {
     if (!user) return openLogin();
-    if (getCartTotal() < webflowData.minimumPurchaseAmount) return setShowMinOrderPopup(true);
+    //if (getCartTotal() < webflowData.minimumPurchaseAmount) return setShowMinOrderPopup(true);
     setIsCheckout(true);
   };
 

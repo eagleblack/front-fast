@@ -22,7 +22,7 @@ const Checkout = () => {
   const totalAmount = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
   // IMPORTANT: Replace this with your actual Firebase Function URL after deployment
-  const FIREBASE_FUNCTION_URL = "http://127.0.0.1:5001/fir-admin-d1ae6/us-central1/api";
+  const FIREBASE_FUNCTION_URL = "https://fir-admin-d1ae6.web.app/api";
 
   const handlePayment = async () => {
     // Validation
@@ -73,10 +73,11 @@ const Checkout = () => {
       const body = {
         amount: totalAmount, // Send in rupees, backend converts to paise
         orderId: orderId,
-        userId: `USER_${Date.now()}`, // In production, use actual user ID from auth
+        userId: userDetails.uid??`USER_${Date.now()}`, // In production, use actual user ID from auth
         userPhone: userDetails.phone,
         userName: userDetails.name,
         userEmail: userDetails.email,
+        items: cartItems,
         redirectUrl: `${window.location.origin}/payment-status?orderId=${orderId}`
       };
 
@@ -92,8 +93,8 @@ const Checkout = () => {
 
       const data = await response.json();
       console.log("Payment Response:", data);
-
-      if (data.success && data.data.redirectUrl) {
+      console.log(response)
+      if (data.success && data.redirectUrl) {
         toast({
           title: "Redirecting to PhonePe...",
           description: "Please complete your payment on the PhonePe page.",
@@ -104,7 +105,7 @@ const Checkout = () => {
 
         // Redirect to PhonePe payment page
         setTimeout(() => {
-          window.location.href = data.data.redirectUrl;
+          window.location.href = data.redirectUrl;
         }, 1000);
       } else {
         toast({

@@ -38,8 +38,8 @@ const MyOrders: React.FC = () => {
     const fetchOrders = async () => {
       try {
         const q = query(
-          collection(db, "orders"),
-          where("createdBy", "==", userData.uid),
+          collection(db, "transactions"),
+          where("userId", "==", userData.uid),
           orderBy("createdAt", "desc")
         );
 
@@ -51,7 +51,8 @@ const MyOrders: React.FC = () => {
           const data = snapshot.docs.map(
             (doc) => ({ id: doc.id, ...doc.data() } as Order)
           );
-          setOrders(data);
+          console.log(data)
+         setOrders(data);
         }
       } catch (err) {
         console.error("Error fetching orders:", err);
@@ -135,22 +136,22 @@ const MyOrders: React.FC = () => {
                         : "bg-green-100 text-green-800"
                     }`}
                   >
-                    {order.paymentStatus}
+                    {order.status}
                   </span>
                 </div>
 
                 <h2 className="text-lg font-bold mb-2">
-                  Order #{order.orderId}
+                  Order #{order.orderId ?? order.merchantOrderId }
                 </h2>
                 <p className="text-sm text-gray-600 mb-4">
                   Total:{" "}
                   <span className="font-semibold text-gray-800">
-                    Rs {order.total.toFixed(2)}
+                    Rs {order.amount.toFixed(2)}
                   </span>
                 </p>
 
                 <div className="flex flex-col gap-3 mb-4">
-                  {order.cartItems.map((item) => (
+                  {order.items.map((item) => (
                     <div
                       key={item.id}
                       className="flex items-center gap-3 border-b border-gray-100 pb-3 last:border-0"

@@ -1,4 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 interface FeaturedProduct {
   addOnImages?: string[];
@@ -50,91 +52,43 @@ export const WebflowProvider = ({ children }: { children: ReactNode }) => {
   const [featuredError, setFeaturedError] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadMockData = () => {
-      // Mock webflow data - Stationary themed
-      const mockWebflowData: WebflowData = {
-        banner: [
-          "/banner.png" // Local banner image from public folder
-        ],
-        categories: [
-          { icon: "📝", name: "notebooks" },
-          { icon: "✏️", name: "pens" },
-          { icon: "📚", name: "books" },
-          { icon: "📎", name: "office-supplies" },
-          { icon: "🎨", name: "art-supplies" }
-        ],
-        discount: 0,
-        minimumPurchaseAmount: 1000,
-        sale: { isActive: false }
-      };
-
-      // Mock featured products - Stationary themed
-      const mockFeaturedProducts: FeaturedProduct[] = [
-        {
-          id: "mock-1", // Match the main products IDs
-          name: "Premium Notebook Set",
-          price: 299,
-          discount: 25,
-          category: "notebooks",
-          mainImage: "/assest/sample-product-1.jpg",
-          description: "High-quality premium notebook set with lined pages and durable hardcover binding.",
-          sku: "NB-001",
-          stock: 100,
-          addOnImages: ["/assest/sample-product-2.jpg"]
-        },
-        {
-          id: "mock-2", // Match the main products IDs
-          name: "Professional Pen Collection",
-          price: 899,
-          discount: 30,
-          category: "pens",
-          mainImage: "/assest/sample-product-2.jpg",
-          description: "Premium ballpoint and gel pen collection for professional writing needs.",
-          sku: "PEN-001",
-          stock: 80,
-          addOnImages: ["/assest/sample-product-3.jpg"]
-        },
-        {
-          id: "mock-3", // Match the main products IDs
-          name: "Office Supply Bundle",
-          price: 799,
-          discount: 33,
-          category: "office-supplies",
-          mainImage: "/assest/sample-product-3.jpg",
-          description: "Complete office supply bundle with staplers, clips, folders, and organizers.",
-          sku: "OFF-001",
-          stock: 60,
-          addOnImages: ["/assest/sample-product-1.jpg"]
-        },
-        {
-          id: "mock-4", // Match the main products IDs
-          name: "Art Supplies Kit",
-          price: 1299,
-          discount: 32,
-          category: "art-supplies",
-          mainImage: "/assest/sample-product-1.jpg",
-          description: "Professional art supplies kit with pencils, markers, brushes, and drawing pads.",
-          sku: "ART-001",
-          stock: 45,
-          addOnImages: ["/assest/sample-product-2.jpg"]
-        }
-      ];
-
-      // Simulate loading
-      setTimeout(() => {
-        setWebflowData(mockWebflowData);
+    const fetchWebflow = async () => {
+      setWebflowLoading(true);
+      try {
+        const snap = await getDoc(doc(db, "webflow", "webflowData"));
+        if (snap.exists()) 
+          {console.log(snap.data())
+            setWebflowData(snap.data() as WebflowData);}
+        else throw new Error("webflowData not found");
+      } catch (err: any) {
+        setWebflowError(err.message);
+      } finally {
         setWebflowLoading(false);
-        
-        // Load featured products after webflow data
-        setTimeout(() => {
-          setFeaturedData(mockFeaturedProducts);
-          setFeaturedLoading(false);
-        }, 500);
-      }, 500);
+      }
     };
-
-    loadMockData();
+    fetchWebflow();
   }, []);
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      if (!webflowData) return;
+      setFeaturedLoading(true);
+      try {
+        const snap = await getDoc(doc(db, "meta", "featured"));
+        if (snap.exists()) 
+          {
+            console.log(snap.data().featured)
+            setFeaturedData(snap.data().featured as FeaturedProduct[]);
+          }
+        else throw new Error("featured not found");
+      } catch (err: any) {
+        setFeaturedError(err.message);
+      } finally {
+        setFeaturedLoading(false);
+      }
+    };
+    fetchFeatured();
+  }, [webflowData]);
 
   return (
     <WebflowContext.Provider
